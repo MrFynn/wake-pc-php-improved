@@ -1,54 +1,36 @@
-# Wake PC
+# Wake PC – PHP Improved Fork
 
-Wake PC is a super tiny password protected webapp for linux machines that sends WOL packets, written in PHP.
+Fork of [szabodanika/wake-pc](https://github.com/szabodanika/wake-pc) with enhancements for Linux PHP environments and systemd integration.
 
 ![screenshot](https://github.com/szabodanika/wake-pc/blob/master/readme-header.png)
 
-## How to set up
+## Features in this Fork
+- **Native PHP WOL**: Replaced `netcat` (`nc`) dependency with pure PHP socket implementation for sending magic packets.
+- **Improved Online Check**: Uses ICMP ping instead of `fsockopen` on arbitrary ports for better reliability.
+- **Systemd-Friendly**: Fully compatible with running as a systemd service.
+- **Simple Setup**: Configure `config.ini` and run with PHP's built-in server or as a systemd service.
 
-### Quick setup
-You can run this command to run to quickly set up and serve Wake PC on port 9010 using PHP's embedded webserver. This will load a default configuration, so you need to edit `config.ini` later. For Wake PC to work make sure to follow the instructions for configuring your target machine as well, otherwise it might not work!
+## Quick Setup
+1. Fork and clone this repository to your machine.
+2. Create a directory, e.g., `/var/www/wake-pc`.
+3. Copy the repository files to the directory.
+4. Edit `config.ini` with your target PC(s) MAC and broadcast addresses.
+5. For testing, start the PHP built-in server:
+   ```bash
+   php -S 0.0.0.0:9010
+   ```
+6. For production, create and enable a `wake-pc.service` systemd service (see original README for an example).
+7. Monitor activity via systemd logs:
+   ```bash
+   journalctl -u wake-pc.service -f
+   ```
 
-```
-sudo sh -c 'curl -s https://raw.githubusercontent.com/szabodanika/wake-pc/master/quicksetup.sh | bash'
-```
+## Differences from Original
+| Feature                | Original                              | This Fork                             |
+|------------------------|---------------------------------------|---------------------------------------|
+| **WOL Method**         | `netcat` via `shell_exec`             | Pure PHP socket implementation        |
+| **Online Check**       | `fsockopen` on configurable port      | ICMP ping                            |
+| **Systemd**            | Works manually                        | Fully compatible with systemd        |
 
-Or you can do it manually:
-
-1. Create a folder in /var/www/ and navigate to it
-```
-mkdir /var/www/wake-pc
-cd /var/www/wake-pc
-```
-3. Download index.php and config template
-```
-wget https://raw.githubusercontent.com/szabodanika/wake-pc/master/index.php
-wget https://raw.githubusercontent.com/szabodanika/wake-pc/master/config-template.ini
-```
-3. Copy template
-```
-cp config-template.ini config.ini
-```
-4. Edit template using any text editor
-```
-sudo vim config.ini
-```
-5. Start embedded PHP webserver or host with your webserver of choice (NGINX, Apache etc.)
-```
-php -S 0.0.0.0:9010
-```
-### Client configuration
-
-For WOL to work it needs ot be enabled on the target PC, by default this is usually not the case. You will likely find this setting in your BIOS.
-
-You also need to make sure that the machine will only be woken up by WOL packets and nothing else, otherwise the initial ping that checks whether the machine is online will also turn it on.
-
-Go in Control Panel\All Control Panel Items\Network Connections, select your connection -> right click -> Properties -> Power Management, tick "Allow this device to wake the computer" and make sure to also tick "Only allow a magic packet to wake the computer".
-
-
-## Planned improvements
-- Remove plaintext password haha
-- GUI config
-- Scheduling
-- Shutdown and reboot maybe?
-- Toggling pinging on and off
+## Original Repository
+[szabodanika/wake-pc](https://github.com/szabodanika/wake-pc)
